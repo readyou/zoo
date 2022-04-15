@@ -6,8 +6,13 @@ import (
 	"strings"
 )
 
+var Err *errUtil = &errUtil{}
+
+type errUtil struct {
+}
+
 // print stack trace for debug
-func Trace(message string) string {
+func (*errUtil) Trace(message string) string {
 	var pcs [32]uintptr
 	callerList := runtime.Callers(3, pcs[:]) // skip first 3 caller
 
@@ -19,4 +24,8 @@ func Trace(message string) string {
 		builder.WriteString(fmt.Sprintf("\n\t%s:%d", file, line))
 	}
 	return builder.String()
+}
+
+func (*errUtil) ServerError(code string, message string) error {
+	return fmt.Errorf("%s:%s", code, message)
 }

@@ -85,9 +85,9 @@ func (c *Context) ParseJSON(target any) {
 }
 
 // skip remaining handlers
-func (c *Context) Fail(code int, err string) {
+func (c *Context) Fail(statusCode int, message string) {
 	c.index = len(c.handlerList)
-	c.JSON(code, M{"error": err})
+	c.String(statusCode, message)
 }
 
 func (c *Context) InternalError() {

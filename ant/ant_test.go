@@ -14,7 +14,7 @@ import (
 )
 
 var addr = "localhost:8881"
-var s = "hello world"
+var hello = "hello world"
 
 type RegisterReq struct {
 	UserName string `json:"user_name"`
@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 }
 
 func startServer(addr string, isStarted chan bool) {
-	s = strings.ToLower(s)
+	hello = strings.ToLower(hello)
 	engine := Default()
 	// config
 	engine.Get("/", func(c *Context) {
@@ -67,7 +67,7 @@ func startServer(addr string, isStarted chan bool) {
 
 	group = engine.AddGroup("/g2")
 	group.Use(func(context *Context) {
-		s = strings.ToUpper(s)
+		hello = strings.ToUpper(hello)
 	})
 	group.Get("/hello", func(c *Context) {
 		c.String(http.StatusOK, "hello group")
@@ -120,10 +120,10 @@ func TestEngine(t *testing.T) {
 	assert.Nil(t, err, err)
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 
-	assert.Equal(t, "hello world", s)
+	assert.Equal(t, "hello world", hello)
 	resp, err = http.Get(getURL(addr, "/g2/hello"))
 	assert.Nil(t, err, err)
 	body, err = ioutil.ReadAll(resp.Body)
 	assert.Equal(t, "hello group", string(body))
-	assert.Equal(t, "HELLO WORLD", s)
+	assert.Equal(t, "HELLO WORLD", hello)
 }

@@ -33,7 +33,7 @@ func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 
 func (g *RouterGroup) addRoute(method string, path string, f HandlerFunc) {
 	pattern := NormalizePath(g.prefix + "/" + path)
-	log.Printf("Route %4s - /%s", method, pattern)
+	log.Printf("route registered: %4s /%s", method, pattern)
 	g.engine.router.AddRoute(method, pattern, f)
 }
 

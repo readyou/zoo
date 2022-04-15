@@ -97,9 +97,9 @@ func TestServer_Register(t *testing.T) {
 	s, success := serviceMap.Load("Calculator")
 	assert.True(t, success)
 	methodMap := s.(*service).methodMap
-	assert.Len(t, methodMap, 1)
+	assert.Len(t, methodMap, 2)
 	for k, _ := range methodMap {
-		assert.Equal(t, k, "Add")
+		assert.True(t, k == "Add" || k == "Div")
 	}
 
 	// not a pointer
@@ -246,7 +246,7 @@ func StartServer() {
 func TestRPC(t *testing.T) {
 	StartServer()
 	client := NewClient()
-	err := client.Start(address)
+	err := client.Dial(address)
 	assert.Nil(t, err, err)
 	defer client.Close()
 
@@ -273,7 +273,7 @@ func BenchmarkRPC(b *testing.B) {
 	StartServer()
 
 	client := NewClient()
-	err := client.Start(address)
+	err := client.Dial(address)
 	assert.Nil(b, err, err)
 	defer client.Close()
 

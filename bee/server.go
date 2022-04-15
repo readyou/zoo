@@ -5,19 +5,25 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"git.garena.com/xinlong.wu/zoo/util"
 	"go/token"
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"reflect"
 	"strings"
 	"sync"
-	"zoo/util"
 )
 
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 
 type ServiceError string
+
+const DefaultRPCPath = "/rpc"
+const DefaultDebugPath = "/rpc/debug"
+
+var DefaultServer = NewServer()
 
 func (err *ServiceError) Error() string {
 	return string(*err)
@@ -83,6 +89,8 @@ func (server *Server) register(rcvr any, name string, overrideName bool) error {
 		msg := fmt.Sprintf("rpc.Register: service name exists already %q", s.typ)
 		log.Println(msg)
 		return errors.New(msg)
+	} else {
+		log.Printf("rpc.Register: %s, %#v\n", s.name, s)
 	}
 	return nil
 }
@@ -163,7 +171,7 @@ func suitableMethod(typ reflect.Type) map[string]*methodType {
 			ReplyType: replyType,
 			method:    method,
 		}
-		log.Printf("rpc.Register: register %q success\n", mname)
+		//log.Printf("rpc.Register: register %q success\n", mname)
 	}
 	return methodMap
 }
@@ -179,7 +187,7 @@ func (*service) call(rcvr reflect.Value, mtype *methodType, arg reflect.Value, r
 	defer func() {
 		if e := recover(); e != nil {
 			message := fmt.Sprintf("%s", e)
-			log.Printf("rpc.call: %s\n\n", util.Trace(message))
+			log.Printf("rpc.call: %s\n\n", util.Err.Trace(message))
 			err = errors.New(message)
 		}
 	}()
@@ -187,10 +195,11 @@ func (*service) call(rcvr reflect.Value, mtype *methodType, arg reflect.Value, r
 	method := mtype.method
 	values := method.Func.Call([]reflect.Value{rcvr, arg, reply})
 	e := values[0].Interface()
-	if e == nil {
-		return nil
+	if e != nil {
+		err = e.(error)
+		return
 	}
-	return err.(error)
+	return
 }
 
 type gobServerCodec struct {
@@ -261,27 +270,38 @@ func NewServerWithCodec(codecNewFunc ServerCodecNewFunc) *Server {
 
 // should be called after server been inited properly(call NewServer/NewServerWithCodec)
 func (server *Server) Start(address string) {
+	log.Println("rpc serve at:", address)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalf("listen error: %s\n", address)
 	}
-	server.Accept(listener)
+	server.accept(listener)
 }
 
-func (server *Server) Accept(l net.Listener) {
+func (server *Server) StartHTTP(address string) {
+	http.Handle(DefaultRPCPath, server)
+	http.Handle(DefaultDebugPath, debugHTTP{server})
+	if err := http.ListenAndServe(address, server); err != nil {
+		log.Fatalf("start http server error: %s\n", err.Error())
+	}
+	server.Start(address)
+}
+
+func (server *Server) accept(l net.Listener) {
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Printf("server accept error: %s\n", err)
 			return
 		}
-		go server.ServeConn(conn)
+		log.Printf("client connected: %s\n", conn.RemoteAddr())
+		go server.serveConn(conn)
 	}
 }
 
 var invalidRequest = struct{}{}
 
-func (server *Server) ServeConn(conn io.ReadWriteCloser) {
+func (server *Server) serveConn(conn io.ReadWriteCloser) {
 	sendingMutex := new(sync.Mutex) // one connection should send one request a time
 	serverCodec := server.codecNewFunc(conn)
 	for {
@@ -391,4 +411,22 @@ func (server *Server) sendResponse(sendingMutex *sync.Mutex, codec ServerCodec, 
 		log.Println("rpc: writing response error:", err)
 	}
 	sendingMutex.Unlock()
+}
+
+// Can connect to RPC service using HTTP CONNECT to rpcPath.
+// ServeHTTP implements an http.Handler that answers RPC requests.
+func (server *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "CONNECT" {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		io.WriteString(w, "405 must CONNECT\n")
+		return
+	}
+	conn, _, err := w.(http.Hijacker).Hijack()
+	if err != nil {
+		log.Print("rpc hijacking ", req.RemoteAddr, ": ", err.Error())
+		return
+	}
+	io.WriteString(conn, "HTTP/1.0 "+connected+"\n\n")
+	server.serveConn(conn)
 }

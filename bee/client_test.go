@@ -13,7 +13,7 @@ func TestClient_Call_timeout(t *testing.T) {
 		ConnectTimeout:  time.Second * 10,
 		ResponseTimeout: timeout,
 	})
-	err := client.Start(address)
+	err := client.Dial(address)
 	assert.Nil(t, err, err)
 	defer client.Close()
 

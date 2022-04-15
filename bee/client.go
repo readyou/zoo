@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -19,6 +20,9 @@ func (e ServerError) Error() string {
 
 var ErrShutDown = errors.New("connection is shut down")
 var ErrResponseTimeout = errors.New("get response timeout")
+
+// Can connect to RPC service using HTTP CONNECT to rpcPath.
+var connected = "200 Connected to Go RPC"
 
 type Call struct {
 	Seq           uint64
@@ -132,7 +136,39 @@ func NewClientWithCodec(option ClientOption, codecNewFunc ClientCodecNewFunc) *C
 	return &client
 }
 
-func (client *Client) Start(addr string) (err error) {
+func (client *Client) DialHTTP(addr string) (err error) {
+	if !client.isInited {
+		msg := "rpc client: client not inited, please call NewClient/NewClientWithCodec to create client"
+		log.Println(msg)
+		return errors.New(msg)
+	}
+	conn, err := net.DialTimeout("tcp", addr, client.option.ConnectTimeout)
+	if err != nil {
+		log.Fatalln("rpc client: connecting server error:", err)
+		return
+	}
+	io.WriteString(conn, "CONNECT "+DefaultRPCPath+" HTTP/1.0\n\n")
+
+	// Require successful HTTP response
+	// before switching to RPC protocol.
+	resp, err := http.ReadResponse(bufio.NewReader(conn), &http.Request{Method: "CONNECT"})
+	if err != nil {
+		return
+	}
+	if resp.Status != connected {
+		err = errors.New("unexpected HTTP response: " + resp.Status)
+		conn.Close()
+		return
+	}
+
+	client.codec = client.codecNewFunc(conn)
+	log.Printf("rpc.Client connected: %s\n", addr)
+	go client.run()
+	return
+}
+
+func (client *Client) Dial(addr string) (err error) {
+
 	if !client.isInited {
 		msg := "rpc client: client not inited, please call NewClient/NewClientWithCodec to create client"
 		log.Println(msg)
@@ -144,6 +180,7 @@ func (client *Client) Start(addr string) (err error) {
 		return
 	}
 	client.codec = client.codecNewFunc(conn)
+	log.Printf("rpc.Client connected: %s\n", addr)
 	go client.run()
 	return nil
 }
@@ -256,7 +293,7 @@ func (client *Client) Go(serviceMethod string, args any, reply any, done chan *C
 
 func (client *Client) send(call *Call) {
 	if client.codec == nil {
-		log.Println("please call client.Start(addr) first")
+		log.Println("please call client.Dial(addr) first")
 		return
 	}
 	client.reqMutex.Lock()
