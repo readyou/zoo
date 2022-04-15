@@ -14,6 +14,7 @@ func InitDB() {
 	c := config.Config
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", c.Mysql.Username, c.Mysql.Password, c.Mysql.Address, c.Mysql.Database)
 	db, err := xorm.NewEngine("mysql", dataSourceName)
+	db.SetMaxOpenConns(300)
 	if err != nil {
 		log.Fatalf("InitDB error: %s\n", err.Error())
 	}
