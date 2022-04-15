@@ -5,7 +5,6 @@ import (
 	"git.garena.com/xinlong.wu/zoo/api"
 	"git.garena.com/xinlong.wu/zoo/bee"
 	"git.garena.com/xinlong.wu/zoo/config"
-	"git.garena.com/xinlong.wu/zoo/infra/err_const"
 	"git.garena.com/xinlong.wu/zoo/util"
 	"log"
 	"net/http"
@@ -67,7 +66,7 @@ func proxy(client *bee.Client, c *ant.Context, item proxyItem) {
 	c.ParseJSON(&args)
 	if err := client.Call(item.ServiceMethod, args, reply); err != nil {
 		log.Printf("rpc request error: %s\n", err.Error())
-		c.JSON(http.StatusOK, util.Result.Fail(err_const.SystemError, err.Error()))
+		c.JSON(http.StatusOK, util.Result.Fail("SystemError", err.Error()))
 		return
 	}
 

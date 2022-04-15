@@ -2,7 +2,7 @@ package app
 
 import (
 	"git.garena.com/xinlong.wu/zoo/api"
-	"git.garena.com/xinlong.wu/zoo/infra"
+	infra2 "git.garena.com/xinlong.wu/zoo/tcp-server/infra"
 	"git.garena.com/xinlong.wu/zoo/util"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -11,8 +11,8 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	infra.InitDB()
-	infra.InitRedis()
+	infra2.InitDB()
+	infra2.InitRedis()
 	os.Exit(m.Run())
 }
 

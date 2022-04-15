@@ -3,15 +3,15 @@ package main
 import (
 	"git.garena.com/xinlong.wu/zoo/bee"
 	"git.garena.com/xinlong.wu/zoo/config"
-	infra "git.garena.com/xinlong.wu/zoo/infra"
 	"git.garena.com/xinlong.wu/zoo/tcp-server/app"
+	infra2 "git.garena.com/xinlong.wu/zoo/tcp-server/infra"
 	"log"
 )
 
 func main() {
 	// 初始化
-	infra.InitDB()
-	infra.InitRedis()
+	infra2.InitDB()
+	infra2.InitRedis()
 
 	// 注册RPC
 	server := bee.NewServer()

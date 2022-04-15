@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"git.garena.com/xinlong.wu/zoo/infra/err_const"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
 	"git.garena.com/xinlong.wu/zoo/util"
 	"unicode"
 )

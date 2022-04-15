@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"git.garena.com/xinlong.wu/zoo/infra"
-	"git.garena.com/xinlong.wu/zoo/infra/err_const"
 	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
 	"git.garena.com/xinlong.wu/zoo/util"
 	"log"
 )
