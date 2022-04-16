@@ -2,7 +2,6 @@ package app
 
 import (
 	"git.garena.com/xinlong.wu/zoo/api"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
 	"git.garena.com/xinlong.wu/zoo/tcp-server/domain/domain-service"
 	"git.garena.com/xinlong.wu/zoo/tcp-server/repository"
 	"github.com/jinzhu/copier"
@@ -11,22 +10,11 @@ import (
 type UserApp struct {
 }
 
-func (u *UserApp) Register(req api.RegisterReq, resp *api.ProfileResp) error {
-	user := &domain.User{}
-	user.Username = req.Username
-	if err := user.CheckUsername(); err != nil {
+func (u *UserApp) Register(req api.RegisterReq, resp *bool) error {
+	if err := domain_service.UserDomainService.Register(req.Username, req.Password); err != nil {
 		return err
 	}
-	if err := user.CheckPassword(req.Password); err != nil {
-		return err
-	}
-	user.HashedPassword = user.EncryptPassword(req.Password)
-	if err := repository.UserRepository.Create(user); err != nil {
-		return err
-	}
-	if err := u.getProfile(req.Username, resp); err != nil {
-		return err
-	}
+	*resp = true
 	return nil
 }
 

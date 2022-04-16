@@ -12,6 +12,12 @@ type RefreshTokenReq struct {
 	RefreshToken string
 }
 
+type EchoTokenReq struct {
+	Token string
+	Sleep int64
+	UseDB bool
+}
+
 type LoginReq struct {
 	Username string
 	Password string

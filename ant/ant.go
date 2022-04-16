@@ -85,6 +85,7 @@ func newContext(writer http.ResponseWriter, request *http.Request) *Context {
 }
 
 func (e *Engine) Run(addr string) {
+	log.Printf("ant serve at %s\n", addr)
 	http.ListenAndServe(addr, e)
 }
 

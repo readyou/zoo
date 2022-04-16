@@ -42,7 +42,7 @@ func (*tokenDomainService) Login(username, password string) (*domain.Token, erro
 	if err != nil {
 		return nil, err
 	}
-	if !util.Encrypt.IsPasswordMatch(user.HashedPassword, password) {
+	if !user.IsPasswordMatch(password) {
 		return nil, util.Err.ServerError(err_const.InvalidPassword, "password is wrong")
 	}
 

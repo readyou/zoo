@@ -12,7 +12,7 @@ type RequestResult struct {
 
 var Result *RequestResult = &RequestResult{}
 
-func (*RequestResult) Succeed(data any) *RequestResult {
+func (*RequestResult) OK(data any) *RequestResult {
 	return &RequestResult{
 		Success: true,
 		Data:    data,

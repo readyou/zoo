@@ -3,17 +3,18 @@ package domain
 import (
 	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
 	"git.garena.com/xinlong.wu/zoo/util"
+	"strings"
 	"unicode"
 )
 
 type User struct {
-	Id             int64
-	Username       string // user's identifier(unique) name, same as Id
-	HashedPassword string
-	Nickname       string
-	Avatar         string
-	CreateTime     int64 `xorm:"created"`
-	UpdateTime     int64 `xorm:"updated"`
+	Id                int64
+	Username          string // user's identifier(unique) name, same as Id
+	EncryptedPassword string
+	Nickname          string
+	Avatar            string
+	CreateTime        int64 `xorm:"created"`
+	UpdateTime        int64 `xorm:"updated"`
 }
 
 func (*User) UpdateProfile() error {
@@ -37,8 +38,12 @@ func (user *User) CheckPassword(password string) error {
 	return nil
 }
 
-func (user *User) EncryptPassword(password string) string {
-	return util.Encrypt.EncryptPassword(password)
+func (user *User) SetPassword(password string) {
+	user.EncryptedPassword = util.Encrypt.EncryptPassword(password)
+}
+
+func (user *User) IsPasswordMatch(password string) bool {
+	return strings.EqualFold(user.EncryptedPassword, util.Encrypt.EncryptPassword(password))
 }
 
 // name should be made up of letters, digits, and underscores

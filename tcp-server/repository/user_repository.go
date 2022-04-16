@@ -14,7 +14,12 @@ type userRepository struct {
 }
 
 func (*userRepository) Create(user *domain.User) error {
-	if _, err := infra.DB.Insert(user); err != nil {
+	_, err := infra.XDB.Insert(user)
+	//now := time.Now().Unix()
+	//_, err := infra.DB.Exec("INSERT INTO `user` (`username`,`hashed_password`,`nickname`,`avatar`,`create_time`,`update_time`) VALUES (?,?,?,?,?,?)",
+	//	user.Username, user.HashedPassword, user.Nickname, user.Avatar, now, now)
+	//_, err = infra.DB.Exec("select now()")
+	if err != nil {
 		log.Printf("Insert user error: %+v\n", err)
 		return err
 	}
@@ -22,7 +27,7 @@ func (*userRepository) Create(user *domain.User) error {
 }
 
 func (*userRepository) Update(user *domain.User) error {
-	if _, err := infra.DB.ID(user.Id).Update(user); err != nil {
+	if _, err := infra.XDB.ID(user.Id).Update(user); err != nil {
 		log.Printf("Update user error: %+v\n", err)
 		return err
 	}
@@ -31,7 +36,7 @@ func (*userRepository) Update(user *domain.User) error {
 
 func (*userRepository) GetUserByName(username string) (user *domain.User, err error) {
 	user = &domain.User{Username: username}
-	isExist, err := infra.DB.Get(user)
+	isExist, err := infra.XDB.Get(user)
 	if err != nil {
 		return nil, err
 	}

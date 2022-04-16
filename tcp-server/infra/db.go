@@ -1,23 +1,44 @@
 package infra
 
 import (
+	"database/sql"
 	"fmt"
 	"git.garena.com/xinlong.wu/zoo/config"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"time"
 	"xorm.io/xorm"
 )
 
-var DB *xorm.Engine
+var XDB *xorm.Engine
+var DB *sql.DB
+
+func getDataSourceName() string {
+	c := config.Config
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s", c.Mysql.Username, c.Mysql.Password, c.Mysql.Address, c.Mysql.Database)
+}
+
+func InitXDB() {
+	dataSourceName := getDataSourceName()
+	db, err := xorm.NewEngine("mysql", dataSourceName)
+	db.SetMaxOpenConns(500)
+	db.SetMaxIdleConns(100)
+	//db.ShowSQL(true)
+	if err != nil {
+		log.Fatalf("InitXDB error: %s\n", err.Error())
+	}
+	log.Printf("InitXDB success")
+	XDB = db
+}
 
 func InitDB() {
-	c := config.Config
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", c.Mysql.Username, c.Mysql.Password, c.Mysql.Address, c.Mysql.Database)
-	db, err := xorm.NewEngine("mysql", dataSourceName)
-	db.SetMaxOpenConns(300)
+	dataSourceName := getDataSourceName()
+	db, err := sql.Open("mysql", dataSourceName)
 	if err != nil {
-		log.Fatalf("InitDB error: %s\n", err.Error())
+		panic(err)
 	}
-	log.Printf("InitDB success")
+	db.SetMaxOpenConns(500)
+	db.SetMaxIdleConns(100)
+	db.SetConnMaxIdleTime(time.Minute * 10)
 	DB = db
 }

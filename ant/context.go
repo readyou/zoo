@@ -78,6 +78,8 @@ func (c *Context) FormValue(key string) string {
 }
 
 func (c *Context) ParseJSON(target any) {
+	//all, _ := ioutil.ReadAll(c.Request.Body)
+	//log.Println(string(all))
 	encoder := json.NewDecoder(c.Request.Body)
 	if err := encoder.Decode(target); err != nil {
 		panic(err)

@@ -1,16 +1,20 @@
 package app
 
 import (
+	"context"
 	"git.garena.com/xinlong.wu/zoo/api"
 	infra2 "git.garena.com/xinlong.wu/zoo/tcp-server/infra"
 	"git.garena.com/xinlong.wu/zoo/util"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sync/semaphore"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
+	infra2.InitXDB()
 	infra2.InitDB()
 	infra2.InitRedis()
 	os.Exit(m.Run())
@@ -22,7 +26,7 @@ func TestUserApp_Register(t *testing.T) {
 	req := api.RegisterReq{
 		Password: util.UUID.NewString(),
 	}
-	resp := &api.ProfileResp{}
+	resp := new(bool)
 	// 用户名为空
 	err := userApp.Register(req, resp)
 	assertErrContains(t, err, "username", "length")
@@ -55,8 +59,7 @@ func TestUserApp_Register(t *testing.T) {
 	}
 	err = userApp.Register(req, resp)
 	assert.Nil(t, err, err)
-	assert.Equal(t, req.Username, resp.Username)
-	assert.True(t, resp.Id > 0)
+	assert.True(t, *resp)
 
 	// 再次用相同的username注册，期待报错
 	err = userApp.Register(req, resp)
@@ -76,8 +79,7 @@ func TestUserApp_GetProfile(t *testing.T) {
 	password := util.UUID.NewString()
 	resp, err := Register(username, password)
 	assert.Nil(t, err, err)
-	assert.Equal(t, username, resp.Username)
-	assert.True(t, resp.Id > 0)
+	assert.True(t, *resp)
 }
 
 func TestUserApp_UploadImg(t *testing.T) {
@@ -103,14 +105,36 @@ func TestUserApp_UpdateProfile(t *testing.T) {
 	assert.Equal(t, resp.Token, profile.Nickname)
 }
 
-func Register(username, password string) (*api.ProfileResp, error) {
+func Register(username, password string) (*bool, error) {
 	req := api.RegisterReq{
 		Username: username,
 		Password: password,
 	}
-	resp := &api.ProfileResp{}
+	resp := new(bool)
 	if err := userApp.Register(req, resp); err != nil {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func TestUserApp_Register_bench(t *testing.T) {
+	util.GetQPS(func(n int) {
+		wg := sync.WaitGroup{}
+		wg.Add(n)
+		sem := semaphore.NewWeighted(150)
+		for i := 0; i < n; i++ {
+			go func() {
+				sem.Acquire(context.Background(), 1)
+				defer func() {
+					wg.Done()
+					sem.Release(1)
+				}()
+				username := util.UUID.NewString()
+				password := util.UUID.NewString()
+				_, err := Register(username, password)
+				assert.Nil(t, err, err)
+			}()
+		}
+		wg.Wait()
+	}, 100000)
 }
