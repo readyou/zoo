@@ -1,7 +1,7 @@
 package infra
 
 import (
-	"git.garena.com/xinlong.wu/zoo/config"
+	"zoo/config"
 	"github.com/go-redis/redis/v8"
 	"log"
 )

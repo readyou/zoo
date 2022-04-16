@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"git.garena.com/xinlong.wu/zoo/api"
-	infra2 "git.garena.com/xinlong.wu/zoo/tcp-server/infra"
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/api"
+	infra2 "zoo/tcp-server/infra"
+	"zoo/util"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/semaphore"
 	"os"

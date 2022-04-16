@@ -1,10 +1,10 @@
 package domain_service
 
 import (
-	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/repository"
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/tcp-server/domain"
+	"zoo/tcp-server/infra/err_const"
+	"zoo/tcp-server/repository"
+	"zoo/util"
 )
 
 var TokenDomainService *tokenDomainService = &tokenDomainService{}

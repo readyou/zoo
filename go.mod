@@ -1,4 +1,4 @@
-module git.garena.com/xinlong.wu/zoo
+module zoo
 
 go 1.18
 

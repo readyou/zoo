@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/util"
 	"github.com/spf13/viper"
 	"log"
 	"strings"

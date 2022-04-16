@@ -1,11 +1,11 @@
 package app
 
 import (
-	"git.garena.com/xinlong.wu/zoo/api"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/repository"
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/api"
+	"zoo/tcp-server/domain"
+	"zoo/tcp-server/infra/err_const"
+	"zoo/tcp-server/repository"
+	"zoo/util"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

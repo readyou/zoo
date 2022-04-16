@@ -3,7 +3,7 @@ package infra
 import (
 	"database/sql"
 	"fmt"
-	"git.garena.com/xinlong.wu/zoo/config"
+	"zoo/config"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"time"

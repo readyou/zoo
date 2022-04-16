@@ -1,9 +1,9 @@
 package app
 
 import (
-	"git.garena.com/xinlong.wu/zoo/api"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/domain/domain-service"
-	"git.garena.com/xinlong.wu/zoo/tcp-server/repository"
+	"zoo/api"
+	"zoo/tcp-server/domain/domain-service"
+	"zoo/tcp-server/repository"
 	"github.com/jinzhu/copier"
 )
 

@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/util"
 	"go/token"
 	"io"
 	"log"

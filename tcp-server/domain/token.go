@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"git.garena.com/xinlong.wu/zoo/util"
+	"zoo/util"
 	"time"
 )
 
