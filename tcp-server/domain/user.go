@@ -1,10 +1,10 @@
 package domain
 
 import (
-	"zoo/tcp-server/infra/err_const"
-	"zoo/util"
 	"strings"
 	"unicode"
+	"zoo/tcp-server/infra/err_const"
+	"zoo/util"
 )
 
 type User struct {
@@ -44,6 +44,10 @@ func (user *User) SetPassword(password string) {
 
 func (user *User) IsPasswordMatch(password string) bool {
 	return strings.EqualFold(user.EncryptedPassword, util.Encrypt.EncryptPassword(password))
+}
+
+func (user *User) GetProfileRedisKey() string {
+	return "user_profile_" + user.Username
 }
 
 // name should be made up of letters, digits, and underscores

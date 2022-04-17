@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"zoo/util"
 	"time"
+	"zoo/util"
 )
 
 type Token struct {
@@ -34,6 +34,11 @@ func (token *Token) IsRefreshTokenExpired() bool {
 
 func (token *Token) IsTokenExpired() bool {
 	return time.Now().Unix() > token.ExpireTime
+}
+
+func (token *Token) GetRefreshExpireDuration() time.Duration {
+	t := time.Unix(token.RefreshExpireTime, 0)
+	return t.Sub(time.Now())
 }
 
 func GetTokenKey(token string) string {

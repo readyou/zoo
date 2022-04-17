@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
 	"log"
-	"time"
 	"zoo/tcp-server/domain"
 	"zoo/tcp-server/infra"
 	"zoo/tcp-server/infra/err_const"
@@ -23,7 +22,9 @@ func (*tokenRepository) Save(token *domain.Token) (err error) {
 		return
 	}
 	js := string(bytes)
-	statusCmd := infra.RDB.SetEX(context.Background(), domain.GetTokenKey(token.Token), js, time.Duration(token.RefreshExpireTime))
+	//log.Printf("redis set ex: %s\n", js)
+	key := domain.GetTokenKey(token.Token)
+	statusCmd := infra.RedisClient.SetEX(context.Background(), key, js, token.GetRefreshExpireDuration())
 	if err = statusCmd.Err(); err != nil {
 		log.Printf("save token to redis error:%s\n", err.Error())
 	}
@@ -32,7 +33,7 @@ func (*tokenRepository) Save(token *domain.Token) (err error) {
 
 func (*tokenRepository) Get(token string) (tok *domain.Token, err error) {
 	key := domain.GetTokenKey(token)
-	val, err := infra.RDB.Get(context.Background(), key).Result()
+	val, err := infra.RedisClient.Get(context.Background(), key).Result()
 	switch {
 	case err == redis.Nil:
 		err = util.Err.ServerError(err_const.LoginRequired, "please login first")
@@ -48,7 +49,7 @@ func (*tokenRepository) Get(token string) (tok *domain.Token, err error) {
 
 func (*tokenRepository) Delete(token string) error {
 	key := domain.GetTokenKey(token)
-	_, err := infra.RDB.Del(context.Background(), key).Result()
+	_, err := infra.RedisClient.Del(context.Background(), key).Result()
 	if err != nil {
 		log.Printf("delete token error: %s\n", err.Error())
 		return util.Err.ServerError(err_const.SystemError, "get token error")

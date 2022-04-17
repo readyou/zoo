@@ -2,15 +2,15 @@ package app
 
 import (
 	"context"
-	"zoo/api"
-	infra2 "zoo/tcp-server/infra"
-	"zoo/util"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/semaphore"
 	"os"
 	"strings"
 	"sync"
 	"testing"
+	"zoo/api"
+	infra2 "zoo/tcp-server/infra"
+	"zoo/util"
 )
 
 func TestMain(m *testing.M) {
@@ -88,21 +88,26 @@ func TestUserApp_UploadImg(t *testing.T) {
 
 func TestUserApp_UpdateProfile(t *testing.T) {
 	resp := RegisterAndLogin(t)
-
 	profile := &api.ProfileResp{}
+	userApp.getProfile(resp.Username, profile)
+	assert.Equal(t, "", profile.Avatar)
+	assert.Equal(t, "", profile.Nickname)
+
+	// 修改avatar和nickname
 	avatar := "https://www.shopee.com/" + resp.Token
+	nickname := "nickname"
 	userApp.UpdateProfile(api.UpdateProfileReq{
 		Token:    resp.Token,
-		Nickname: resp.Token,
+		Nickname: nickname,
 		Avatar:   avatar,
 	}, profile)
 	assert.Equal(t, avatar, profile.Avatar)
-	assert.Equal(t, resp.Token, profile.Nickname)
+	assert.Equal(t, nickname, profile.Nickname)
 
 	profile = &api.ProfileResp{}
 	userApp.getProfile(resp.Username, profile)
 	assert.Equal(t, avatar, profile.Avatar)
-	assert.Equal(t, resp.Token, profile.Nickname)
+	assert.Equal(t, nickname, profile.Nickname)
 }
 
 func Register(username, password string) (*bool, error) {
@@ -121,7 +126,7 @@ func TestUserApp_Register_bench(t *testing.T) {
 	util.GetQPS(func(n int) {
 		wg := sync.WaitGroup{}
 		wg.Add(n)
-		sem := semaphore.NewWeighted(150)
+		sem := semaphore.NewWeighted(100)
 		for i := 0; i < n; i++ {
 			go func() {
 				sem.Acquire(context.Background(), 1)

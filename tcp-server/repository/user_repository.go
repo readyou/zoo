@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"github.com/jinzhu/copier"
+	"log"
+	"time"
 	"zoo/tcp-server/domain"
 	"zoo/tcp-server/infra"
 	"zoo/tcp-server/infra/err_const"
 	"zoo/util"
-	"log"
 )
 
 var UserRepository *userRepository = &userRepository{}
@@ -34,14 +36,30 @@ func (*userRepository) Update(user *domain.User) error {
 	return nil
 }
 
-func (*userRepository) GetUserByName(username string) (user *domain.User, err error) {
+func (*userRepository) GetByUsername(username string) (user *domain.User, err error) {
 	user = &domain.User{Username: username}
 	isExist, err := infra.XDB.Get(user)
 	if err != nil {
 		return nil, err
 	}
 	if !isExist {
-		err = util.Err.ServerError(err_const.UserNotExists, "user not found")
+		err = util.Err.ServerError(err_const.UserNotExists, "user not found: "+user.Username)
 	}
+	return
+}
+
+func (*userRepository) GetCache(username string) (user *domain.User, err error) {
+	user = &domain.User{
+		Username: username,
+	}
+	key := user.GetProfileRedisKey()
+	err = infra.RedisUtil.GetOrSet(key, func(key string, ret any) error {
+		user, err = UserRepository.GetByUsername(username)
+		if err != nil {
+			return err
+		}
+		copier.Copy(ret, user)
+		return nil
+	}, time.Hour, user)
 	return
 }

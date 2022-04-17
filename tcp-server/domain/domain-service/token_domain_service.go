@@ -38,7 +38,7 @@ func (*tokenDomainService) Login(username, password string) (*domain.Token, erro
 	if err := user.CheckPassword(password); err != nil {
 		return nil, err
 	}
-	user, err := repository.UserRepository.GetUserByName(username)
+	user, err := repository.UserRepository.GetCache(username)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +79,7 @@ func (*tokenDomainService) RefreshToken(token, refreshToken string) (*domain.Tok
 		return nil, util.Err.ServerError(err_const.LoginRequired, "expired")
 	}
 
+	repository.TokenRepository.Delete(token)
 	newToken := domain.NewToken(tok.Username)
 	if err := repository.TokenRepository.Save(newToken); err != nil {
 		return nil, util.Err.ServerError(err_const.LoginRequired, err.Error())

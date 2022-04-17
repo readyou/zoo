@@ -1,10 +1,10 @@
 package app
 
 import (
+	"github.com/jinzhu/copier"
 	"zoo/api"
 	"zoo/tcp-server/domain/domain-service"
 	"zoo/tcp-server/repository"
-	"github.com/jinzhu/copier"
 )
 
 type UserApp struct {
@@ -23,20 +23,11 @@ func (u *UserApp) UpdateProfile(req api.UpdateProfileReq, resp *api.ProfileResp)
 	if err != nil {
 		return err
 	}
-
-	user, err := repository.UserRepository.GetUserByName(token.Username)
+	user, err := domain_service.UserDomainService.UpdateProfile(token.Username, req.Nickname, req.Avatar)
 	if err != nil {
 		return err
 	}
-
-	copier.Copy(&user, req)
-	if err := repository.UserRepository.Update(user); err != nil {
-		return err
-	}
-
-	if err := u.getProfile(user.Username, resp); err != nil {
-		return err
-	}
+	copier.Copy(resp, user)
 	return nil
 }
 
@@ -53,7 +44,7 @@ func (u *UserApp) GetProfile(req api.GetProfileReq, resp *api.ProfileResp) error
 }
 
 func (u *UserApp) getProfile(username string, resp *api.ProfileResp) error {
-	user, err := repository.UserRepository.GetUserByName(username)
+	user, err := repository.UserRepository.GetCache(username)
 	if err != nil {
 		return err
 	}
@@ -62,6 +53,10 @@ func (u *UserApp) getProfile(username string, resp *api.ProfileResp) error {
 }
 
 func (u *UserApp) UploadImg(req api.UploadImgReq, resp *string) error {
+	_, err := domain_service.TokenDomainService.ValidateToken(req.Token)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
