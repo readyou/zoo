@@ -2,7 +2,7 @@ package ant
 
 import (
 	"fmt"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/util"
 	"log"
 	"net/http"
 )

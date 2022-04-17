@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"zoo/util"
 	"go/token"
 	"io"
 	"log"
@@ -14,6 +13,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"git.garena.com/xinlong.wu/zoo/util"
 )
 
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
@@ -273,7 +273,7 @@ func (server *Server) Start(address string) {
 	log.Println("rpc serve at:", address)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
-		log.Fatalf("listen error: %s\n", address)
+		log.Fatalf("rpc server listen error: %s\n", address)
 	}
 	server.accept(listener)
 }

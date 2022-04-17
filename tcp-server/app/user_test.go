@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"zoo/api"
-	infra2 "zoo/tcp-server/infra"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/api"
+	infra2 "git.garena.com/xinlong.wu/zoo/tcp-server/infra"
+	"git.garena.com/xinlong.wu/zoo/util"
 )
 
 func TestMain(m *testing.M) {
@@ -80,10 +80,6 @@ func TestUserApp_GetProfile(t *testing.T) {
 	resp, err := Register(username, password)
 	assert.Nil(t, err, err)
 	assert.True(t, *resp)
-}
-
-func TestUserApp_UploadImg(t *testing.T) {
-
 }
 
 func TestUserApp_UpdateProfile(t *testing.T) {

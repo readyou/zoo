@@ -2,7 +2,7 @@ package domain
 
 import (
 	"time"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/util"
 )
 
 type Token struct {

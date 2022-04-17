@@ -56,7 +56,7 @@ func (c *Context) HTML(code int, htmlStr string) {
 }
 
 func (c *Context) JSON(code int, jsonObj any) {
-	c.SetHeader("content-type", "text/plain")
+	c.SetHeader("content-type", "application/json")
 	c.Status(code)
 	encoder := json.NewEncoder(c.Writer)
 	if err := encoder.Encode(jsonObj); err != nil {

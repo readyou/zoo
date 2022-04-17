@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/util"
 	"github.com/spf13/viper"
 	"log"
 	"strings"
@@ -33,7 +33,7 @@ func init() {
 	// live deploy:
 	// 1. edit config file: /opt/data/config/config.live.yml
 	// 2. start app: ZOO_PROFILE=live ./zoo
-	profile := strings.ToLower(util.Env.GetEnvDefault("ZOO_PROFILE", "dev"))
+	profile := strings.ToLower(util.Env.GetEnvDefault("git.garena.com/xinlong.wu/zoo_PROFILE", "dev"))
 	configName := fmt.Sprintf("config.%s.yml", profile)
 	log.Printf("load config from %s\n", configName)
 	viper.AutomaticEnv()

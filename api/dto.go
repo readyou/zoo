@@ -23,6 +23,10 @@ type LoginReq struct {
 	Password string
 }
 
+type ValidateTokenReq struct {
+	Token string
+}
+
 type LogoutReq struct {
 	Token string
 }
@@ -31,11 +35,6 @@ type UpdateProfileReq struct {
 	Token    string
 	Nickname string
 	Avatar   string
-}
-
-type UploadImgReq struct {
-	Token    string
-	ByteList []byte
 }
 
 type GetProfileReq struct {

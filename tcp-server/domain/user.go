@@ -1,10 +1,10 @@
 package domain
 
 import (
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
+	"git.garena.com/xinlong.wu/zoo/util"
 	"strings"
 	"unicode"
-	"zoo/tcp-server/infra/err_const"
-	"zoo/util"
 )
 
 type User struct {

@@ -6,5 +6,4 @@ const (
 	UserNotExists   = "UserNotExists"
 	InvalidPassword = "InvalidPassword"
 	LoginRequired   = "LoginRequired"
-	TokenExpired    = "TokenExpired"
 )

@@ -1,5 +1,5 @@
 .idea/
 config/config.dev.yml
 **/zoo
-**/http-server
-**/tcp-server
+cmd/http-server-main/http-server-main
+cmd/tcp-server-main/tcp-server-main

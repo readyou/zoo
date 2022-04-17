@@ -1,10 +1,10 @@
 package domain_service
 
 import (
-	"zoo/tcp-server/domain"
-	"zoo/tcp-server/infra/err_const"
-	"zoo/tcp-server/repository"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/repository"
+	"git.garena.com/xinlong.wu/zoo/util"
 )
 
 var TokenDomainService *tokenDomainService = &tokenDomainService{}
@@ -24,7 +24,7 @@ func (*tokenDomainService) ValidateToken(token string) (*domain.Token, error) {
 		return nil, util.Err.ServerError(err_const.LoginRequired, "token expired")
 	}
 	if tok.IsTokenExpired() {
-		return nil, util.Err.ServerError(err_const.TokenExpired, "token expired")
+		return nil, util.Err.ServerError(err_const.LoginRequired, "token expired")
 	}
 	return tok, nil
 }

@@ -4,10 +4,10 @@ import (
 	"github.com/jinzhu/copier"
 	"log"
 	"time"
-	"zoo/tcp-server/domain"
-	"zoo/tcp-server/infra"
-	"zoo/tcp-server/infra/err_const"
-	"zoo/util"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/domain"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra"
+	"git.garena.com/xinlong.wu/zoo/tcp-server/infra/err_const"
+	"git.garena.com/xinlong.wu/zoo/util"
 )
 
 var UserRepository *userRepository = &userRepository{}
