@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/semaphore"
 	"sync"
@@ -72,4 +73,9 @@ func TestGetQPSAsnyc(t *testing.T) {
 	// 用chan实现的并发控制比semaphore实现的，性能要好一些（高并发情况下）
 	// qps在10万以下的话，性能差不多，semaphore代码更优雅一点
 	assert.True(t, qps > 1000000)
+}
+
+func TestF(t *testing.T) {
+	a := make([]int, 10)
+	fmt.Println(len(a))
 }
